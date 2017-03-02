@@ -1,108 +1,48 @@
-const containers = [];
-var container = '';
+class BaseStore {
 
-class Store {
+	/**
+	 * Build up base store. Takes in custom options for configuration, and then picks up any containers already created
+	 * @param  {Object} options Configuration options
+	 * @return {Object}         Return self
+	 */
+	constructor(options = null) {
+		let baseOptions = {
+			version: '1.0.0',
+			autoClean: false,
+			expirytime: Math.floor( ( Date.now() / 1000 ) + 259200 ),
+			prefix: 'BS_'
+		};
 
-	static create(containerName, expiry, data = null) {
-		localStorage.setItem(containerName, JSON.stringify({
-			expiry: moment(expiry),
-			data: data,
-		}));
-		containers.push(containerName);
-		console.log(`${containerName} has been created`);
-	}
-
-	static dump(containerName) {
-		localStorage.removeItem(containerName);
-	}
-
-	static use(containerName) {
-		container = containerName;
-		console.log(`Now using container : ${containerName}`);
-	}
-
-	static switch(containerName) {
-		container = containerName;
-	}
-
-	static containers() {
-		return containers;
-	}
-
-	static add(data, containerName = null, expiry = null) {
-		let newExpiry;
-		if(containerName === null) {
-			console.log(`No container passed, using ${container}`);
-		} else {
-			console.log(`Adding item to ${containerName}`);
-			container = containerName;
+		if ( options !== null ) {
+			Object.assign( baseOptions, options );
 		}
+		this.options = baseOptions;
 
-		let target = JSON.parse(localStorage.getItem(container));
-		
-		if(expiry === null) {
-			newExpiry = target.expiry;
-		} else {
-			newExpiry = moment(expiry);
-		}
-		localStorage.setItem(container, JSON.stringify({
-			expiry: newExpiry,
-			data: data,
-		}));
-		console.log(`Added data to ${container}`);
-	}
+		this.container = "";
+		this.containers = [];
 
-	static empty(containerName = null) {
-		if(containerName === null) {
-			console.log(`No container passed, using ${container}`);
-		} else {
-			console.log(`Emptying ${containerName}`);
-			container = containerName;
-		}
-		let target = JSON.parse(localStorage.getItem(container));
-
-		localStorage.setItem(container, JSON.stringify({
-			expiry: target.expiry,
-			data: null,
-		}));
-		console.log(`${container} has been emptied.`);
-	}
-
-	static clean() {
-		for(let i = 0, len = containers.length; i < len; i++) {
-			let container = containers[i];
-			container = JSON.parse(localStorage.getItem(container));
-			if(moment(new Date()).isAfter(container.expiry)) {
-				localStorage.removeItem(containers[i]);
-				console.log(`${containers[i]} container removed`);
+		for ( var i = 0; i < localStorage.length; i++ ) {
+			if ( localStorage.key(i).substring(0. 3) === this.options.prefix ) {
+				this.containers.push(localStorage.key(i));
 			}
 		}
+
+		return this;
 	}
 
-	static reset() {
-		localStorage.clear();
-		console.log(`All containers have been reset`);
-	}
-
-	static parse(containerName = null) {
-		if(containerName === null) {
-			console.log(`No container passed, using ${container}`);
-		} else {
-			console.log(`Parsing ${containerName}`);
-			container = containerName;
-		}
-		return JSON.parse(localStorage.getItem(container));
-	}
-
-	static supported() {
-		let test = 'test';
+	/**
+	 * Check browser compatability of localStorage
+	 * @return {Boolean} Returns true if localStorage is available
+	 */
+	supported() {
+		// testing if localStorage is supported in this browser
+		let test = "test";
 		try {
-			localStorage.setItem(test, test);
-			localStorage.removeItem(test);
+			localStorage.setItem( test, test );
+			localStorage.removeItem( test );
 			return true;
-		} catch(e) {
+		} catch( e ) {
 			return false;
 		}
 	}
-
 }
