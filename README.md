@@ -1,6 +1,9 @@
 # StoreJS
 A simple JavaScript localStorage wrapper library.
 
+
+## Please note, this library is currently being refactored from the ground up.
+
 Each localStorage item gets stored as a 'container' which has an 'expiry' field and a 'data' field.
 To create a 'container' use the following syntax:
 
