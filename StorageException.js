@@ -1,4 +1,4 @@
-import BaseException from './BaseException';
+import {BaseException} from './BaseException';
 
 export default class StorageException extends BaseException {
 	notFound(container) {
