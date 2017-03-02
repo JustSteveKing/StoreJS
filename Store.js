@@ -1,4 +1,6 @@
-class BaseStore {
+import {StorageException} from './StorageException';
+
+export default class BaseStore {
 
 	/**
 	 * Build up base store. Takes in custom options for configuration, and then picks up any containers already created
